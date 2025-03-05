@@ -27,24 +27,24 @@ To use django-telegrambot in a app, create a telegrambot.py module in your app a
 
 
     def error(bot, update, error):
-        logger.warn('Update "%s" caused error "%s"' % (update, error))
+        logger.warning('Update "%s" caused error "%s"' % (update, error))
 
 
     def main():
         logger.info("Loading handlers for telegram bot")
 
         # Default dispatcher (this is related to the first bot in settings.DJANGO_TELEGRAMBOT['BOTS'])
-        dp = DjangoTelegramBot.dispatcher
-        # To get Dispatcher related to a specific bot
-        # dp = DjangoTelegramBot.getDispatcher('BOT_n_token')     #get by bot token
-        # dp = DjangoTelegramBot.getDispatcher('BOT_n_username')  #get by bot username
+        app = DjangoTelegramBot.application
+        # To get Application related to a specific bot
+        # app = DjangoTelegramBot.get_application('BOT_n_token')     #get by bot token
+        # app = DjangoTelegramBot.get_application('BOT_n_username')  #get by bot username
 
         # on different commands - answer in Telegram
-        dp.add_handler(CommandHandler("start", start))
-        dp.add_handler(CommandHandler("help", help))
+        app.add_handler(CommandHandler("start", start))
+        app.add_handler(CommandHandler("help", help))
 
         # on noncommand i.e message - echo the message on Telegram
-        dp.add_handler(MessageHandler([Filters.text], echo))
+        app.add_handler(MessageHandler([Filters.text], echo))
 
         # log all errors
-        dp.add_error_handler(error)
+        app.add_error_handler(error)

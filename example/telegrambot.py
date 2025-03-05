@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Example code for telegrambot.py module
-from telegram.ext import CommandHandler, MessageHandler, Filters
+from telegram.ext import CommandHandler, MessageHandler, filters
 from django_telegrambot.apps import DjangoTelegramBot
 
 import logging
@@ -29,21 +29,21 @@ def main():
     logger.info("Loading handlers for telegram bot")
 
     # Default dispatcher (this is related to the first bot in settings.TELEGRAM_BOT_TOKENS)
-    dp = DjangoTelegramBot.dispatcher
+    app = DjangoTelegramBot.application
     # To get Dispatcher related to a specific bot
-    # dp = DjangoTelegramBot.getDispatcher('BOT_n_token')     #get by bot token
-    # dp = DjangoTelegramBot.getDispatcher('BOT_n_username')  #get by bot username
+    # app = DjangoTelegramBot.getDispatcher('BOT_n_token')     #get by bot token
+    # app = DjangoTelegramBot.getDispatcher('BOT_n_username')  #get by bot username
 
     # on different commands - answer in Telegram
-    dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("help", help))
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("help", help))
 
     # on noncommand i.e message - echo the message on Telegram
-    dp.add_handler(MessageHandler([Filters.text], echo))
+    app.add_handler(MessageHandler([filters.TEXT], echo))
 
     # log all errors
-    dp.add_error_handler(error)
+    app.add_error_handler(error)
 
     # log all errors
-    dp.addErrorHandler(error)
+    app.addErrorHandler(error)
 

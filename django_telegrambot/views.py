@@ -8,8 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 import sys
 import json
 import telegram
-from telegram.error import (TelegramError, Unauthorized, BadRequest,
-                            TimedOut, ChatMigrated, NetworkError)
+from telegram.error import (TelegramError, )
 # import the logging library
 import logging
 
@@ -19,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 @staff_member_required
 def home(request):
-    bot_list = DjangoTelegramBot.bots
+    bot_list = [app.bot for app in DjangoTelegramBot.bot_applications]
     context = {'bot_list': bot_list, 'update_mode':settings.DJANGO_TELEGRAMBOT.get('MODE', 'WEBHOOK')}
     return render(request, 'django_telegrambot/index.html', context)
 
@@ -28,31 +27,32 @@ def home(request):
 def webhook (request, bot_token):
 
     #verifico la validità del token
-    bot = DjangoTelegramBot.getBot(bot_id=bot_token, safe=False)
+    global update
+    bot = DjangoTelegramBot.get_bot(bot_id=bot_token, safe=False)
     if bot is None:
-        logger.warn('Request for not found token: {}'.format(bot_token))
+        logger.warning('Request for not found token: {}'.format(bot_token))
         return JsonResponse({})
 
     try:
         data = json.loads(request.body.decode("utf-8"))
 
     except:
-        logger.warn('Telegram bot <{}> receive invalid request: {}'.format(bot.username, repr(request)))
+        logger.warning('Telegram bot <{}> receive invalid request: {}'.format(bot.username, repr(request)))
         return JsonResponse({})
 
-    dispatcher = DjangoTelegramBot.getDispatcher(bot_token, safe=False)
-    if dispatcher is None:
+    application = DjangoTelegramBot.get_application(bot_token, safe=False)
+    if application is None:
         logger.error('Dispatcher for bot <{}> not found: {}'.format(bot.username, bot_token))
         return JsonResponse({})
 
     try:
         update = telegram.Update.de_json(data, bot)
-        dispatcher.process_update(update)
+        application.process_update(update)
         logger.debug('Bot <{}> : Processed update {}'.format(bot.username, update))
     # Dispatch any errors
     except TelegramError as te:
-        logger.warn("Bot <{}> : Error was raised while processing Update.".format(bot.username))
-        dispatcher.dispatchError(update, te)
+        logger.warning("Bot <{}> : Error was raised while processing Update.".format(bot.username))
+        application.process_error(update, te)
 
     # All other errors should not stop the thread, just print them
     except:
