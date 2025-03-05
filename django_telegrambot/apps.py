@@ -100,7 +100,7 @@ class DjangoTelegramBot(AppConfig):
                 continue
             DjangoTelegramBot.__used_tokens.add(token)
             DjangoTelegramBot.bot_tokens.append(token)
-        logger.debug('Telegram Bot <{}> set as default bot'.format(DjangoTelegramBot.bots[0].username))
+        logger.debug('Telegram Bot <{}> set as default bot'.format(DjangoTelegramBot.bot_tokens[0]))
 
         def module_imported(module_name, method_name, execute):
             try:
