@@ -131,5 +131,4 @@ class DjangoTelegramBot(AppConfig):
         if num_bots>0:
             logger.info('Please manually start polling update for {0} bot{1}. Run command{1}:'.format(num_bots, 's' if num_bots>1 else ''))
             for token in DjangoTelegramBot.__used_tokens:
-                updater = DjangoTelegramBot.get_updater(bot_id=token)
-                logger.info('python manage.py botpolling --username={}'.format(updater.bot.username))
+                logger.info('python manage.py botpolling --token={}'.format(token))
