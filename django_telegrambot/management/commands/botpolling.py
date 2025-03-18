@@ -1,8 +1,6 @@
 import logging
 
 from django.core.management.base import BaseCommand
-#from telegram.ext import Updater
-
 from django_telegrambot.apps import DjangoTelegramBot
 
 
@@ -74,4 +72,3 @@ class Command(BaseCommand):
                       read_latency=read_latency,
                       allowed_updates=allowed_updates)
         self.stdout.write("the bot is started and runs until we press Ctrl-C on the command line.")
-        updater.idle()
