@@ -31,8 +31,8 @@ class Command(BaseCommand):
             self.stderr.write("Webhook mode active in settings.py, change in POLLING if you want use polling update")
             return
 
-        updater = self.get_updater(username=options.get('username'), token=options.get('token'))
-        if not updater:
+        application = self.get_updater(username=options.get('username'), token=options.get('token'))
+        if not application:
             self.stderr.write("Bot not found")
             return
         # Enable Logging
@@ -50,7 +50,7 @@ class Command(BaseCommand):
         bots_list = settings.DJANGO_TELEGRAMBOT.get('BOTS', [])
         b = None
         for bot_set in bots_list:
-            if bot_set.get('TOKEN', None) == updater.bot.token:
+            if bot_set.get('TOKEN', None) == application.bot.token:
                 b = bot_set
                 break
         if not b:
@@ -65,10 +65,10 @@ class Command(BaseCommand):
         read_latency = b.get('POLL_READ_LATENCY', 2.)
 
         self.stdout.write("Run polling...")
-        updater.start_polling(poll_interval=poll_interval,
+        application.run_polling(poll_interval=poll_interval,
                       timeout=timeout,
-                      clean=clean,
+                      # clean=clean,
                       bootstrap_retries=bootstrap_retries,
-                      read_latency=read_latency,
+                      # read_latency=read_latency,
                       allowed_updates=allowed_updates)
         self.stdout.write("the bot is started and runs until we press Ctrl-C on the command line.")
