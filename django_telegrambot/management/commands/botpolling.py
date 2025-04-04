@@ -13,17 +13,11 @@ class Command(BaseCommand):
         parser.add_argument('--token', '-t', help="Bot token", default=None)
         pass
 
-    def get_updater(self, username=None, token=None):
-        updater = None
-        if username is not None:
-            updater = DjangoTelegramBot.get_updater(bot_id=username)
-            if not updater:
-                self.stderr.write("Cannot find default bot with username {}".format(username))
-        elif token:
-            updater = DjangoTelegramBot.get_updater(bot_id=token)
-            if not updater:
-                self.stderr.write("Cannot find bot with token {}".format(token))
-        return updater
+    def get_application(self, username=None, token=None):
+        application = DjangoTelegramBot.get_application(bot_id=username or token)
+        if not application:
+            self.stderr.write("Cannot find default bot with username or token {}".format(username))
+        return application
 
     def handle(self, *args, **options):
         from django.conf import settings
@@ -31,7 +25,7 @@ class Command(BaseCommand):
             self.stderr.write("Webhook mode active in settings.py, change in POLLING if you want use polling update")
             return
 
-        application = self.get_updater(username=options.get('username'), token=options.get('token'))
+        application = self.get_application(username=options.get('username'), token=options.get('token'))
         if not application:
             self.stderr.write("Bot not found")
             return
@@ -65,10 +59,11 @@ class Command(BaseCommand):
         read_latency = b.get('POLL_READ_LATENCY', 2.)
 
         self.stdout.write("Run polling...")
+        self.stdout.write("the bot is started and runs until we press Ctrl-C on the command line.")
         application.run_polling(poll_interval=poll_interval,
                       timeout=timeout,
                       # clean=clean,
                       bootstrap_retries=bootstrap_retries,
                       # read_latency=read_latency,
                       allowed_updates=allowed_updates)
-        self.stdout.write("the bot is started and runs until we press Ctrl-C on the command line.")
+
