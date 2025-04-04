@@ -4,7 +4,7 @@ import os.path
 import importlib
 import logging
 from time import sleep
-
+import asyncio
 from asgiref.sync import async_to_sync
 from django.apps import AppConfig
 from django.apps import apps
@@ -159,7 +159,7 @@ class DjangoTelegramBot(AppConfig):
             if proxy:
                 builder = builder.proxy(proxy['proxy_url'])
             application:Application = builder.build()
-            async_to_sync(application.initialize)()
+            asyncio.run(application.initialize())
             bot = application.bot
             DjangoTelegramBot.bot_applications.append(application)
             if self.mode == WEBHOOK_MODE:
@@ -187,7 +187,7 @@ class DjangoTelegramBot(AppConfig):
 
             else:
                 try:
-                    async_to_sync(bot.delete_webhook)()
+                    asyncio.run(bot.delete_webhook())
                 except RetryAfter as er:
                     logger.debug('Error: "{}". Will retry in {} seconds'.format(
                             er.message,
