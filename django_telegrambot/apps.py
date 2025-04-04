@@ -5,6 +5,7 @@ import importlib
 import logging
 from time import sleep
 
+from asgiref.sync import async_to_sync
 from django.apps import AppConfig
 from django.apps import apps
 from django.conf import settings
@@ -185,7 +186,7 @@ class DjangoTelegramBot(AppConfig):
 
             else:
                 try:
-                    bot.delete_webhook()
+                    async_to_sync(bot.delete_webhook)()
                 except RetryAfter as er:
                     logger.debug('Error: "{}". Will retry in {} seconds'.format(
                             er.message,
