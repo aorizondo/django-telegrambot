@@ -159,6 +159,7 @@ class DjangoTelegramBot(AppConfig):
             if proxy:
                 builder = builder.proxy(proxy['proxy_url'])
             application:Application = builder.build()
+            async_to_sync(application.initialize)()
             bot = application.bot
             DjangoTelegramBot.bot_applications.append(application)
             if self.mode == WEBHOOK_MODE:
