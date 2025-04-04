@@ -51,8 +51,7 @@ class DjangoTelegramBot(AppConfig):
     @classproperty
     def updater(cls):
         #print("Getting value default updater")
-        cls.__used_tokens.add(cls.bot_tokens[0])
-        return cls.bot_applications[0].updater
+        return cls.application.updater
 
     @classmethod
     def get_application(cls, bot_id=None, safe=True):
@@ -93,19 +92,7 @@ class DjangoTelegramBot(AppConfig):
 
     @classmethod
     def get_updater(cls, bot_id=None, safe=True):
-        if bot_id is None:
-            return cls.bot_applications[0].updater
-        else:
-            try:
-                index = cls.bot_tokens.index(bot_id)
-            except ValueError:
-                if not safe:
-                    return None
-                try:
-                    index = cls.bot_usernames.index(bot_id)
-                except ValueError:
-                    return None
-            return cls.bot_applications[index].updater
+        return cls.get_application(bot_id=bot_id, safe=safe).updater
 
     def ready(self):
         if DjangoTelegramBot.ready_run:
