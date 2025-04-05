@@ -129,7 +129,8 @@ class DjangoTelegramBot(AppConfig):
                 certificate=open(cert, 'rb')
             elif cert:
                 logger.error('WEBHOOK_CERTIFICATE not found in {} '.format(cert))
-
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
         for b in bots_list:
             token = b.get('TOKEN', None)
             context = b.get('CONTEXT', False)
@@ -146,7 +147,7 @@ class DjangoTelegramBot(AppConfig):
             if proxy:
                 builder = builder.proxy(proxy['proxy_url'])
             application:Application = builder.build()
-            asyncio.run(application.initialize())
+            loop.run_until_complete(application.initialize())
             bot = application.bot
             DjangoTelegramBot.bot_applications.append(application)
             if self.mode == WEBHOOK_MODE:
@@ -174,7 +175,7 @@ class DjangoTelegramBot(AppConfig):
 
             else:
                 try:
-                    asyncio.run(bot.delete_webhook())
+                    loop.run_until_complete(bot.delete_webhook())
                 except RetryAfter as er:
                     logger.debug('Error: "{}". Will retry in {} seconds'.format(
                             er.message,
